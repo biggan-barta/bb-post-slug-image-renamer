@@ -1,0 +1,198 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: Post Slug Image Renamer 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-08-31 12:00+0000\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Post Slug Image Renamer"
+msgstr ""
+
+msgid "Image Renamer"
+msgstr ""
+
+msgid "General Settings"
+msgstr ""
+
+msgid "General"
+msgstr ""
+
+msgid "Statistics"
+msgstr ""
+
+msgid "About"
+msgstr ""
+
+msgid "Enable Plugin"
+msgstr ""
+
+msgid "Enable automatic image renaming"
+msgstr ""
+
+msgid "Separator"
+msgstr ""
+
+msgid "Character used to separate words in filename"
+msgstr ""
+
+msgid "Maximum Length"
+msgstr ""
+
+msgid "Maximum length of the filename (excluding extension)"
+msgstr ""
+
+msgid "Include Timestamp"
+msgstr ""
+
+msgid "Add timestamp to filename to make it more unique"
+msgstr ""
+
+msgid "Preserve Original Extension"
+msgstr ""
+
+msgid "Keep the original file extension"
+msgstr ""
+
+msgid "Allowed Post Types"
+msgstr ""
+
+msgid "Select post types where image renaming should be active"
+msgstr ""
+
+msgid "Settings saved successfully."
+msgstr ""
+
+msgid "Quick Info"
+msgstr ""
+
+msgid "✓ Renames images uploaded from post editor"
+msgstr ""
+
+msgid "✓ Leaves Media Library uploads unchanged"
+msgstr ""
+
+msgid "✓ Uses post slug as filename base"
+msgstr ""
+
+msgid "✓ Configurable settings"
+msgstr ""
+
+msgid "Need Help?"
+msgstr ""
+
+msgid "Check the About page for more information about how this plugin works."
+msgstr ""
+
+msgid "View About Page"
+msgstr ""
+
+msgid "Total Images Renamed"
+msgstr ""
+
+msgid "Total File Size"
+msgstr ""
+
+msgid "Recent Renames"
+msgstr ""
+
+msgid "No image renames recorded yet."
+msgstr ""
+
+msgid "Post"
+msgstr ""
+
+msgid "Original Filename"
+msgstr ""
+
+msgid "New Filename"
+msgstr ""
+
+msgid "File Size"
+msgstr ""
+
+msgid "Date"
+msgstr ""
+
+msgid "Post not found"
+msgstr ""
+
+msgid "About Post Slug Image Renamer"
+msgstr ""
+
+msgid "What does this plugin do?"
+msgstr ""
+
+msgid "Post Slug Image Renamer automatically renames image files when they are uploaded through the post editor (like featured images or images inserted into post content). The new filename is based on the post slug, making your media files more organized and SEO-friendly."
+msgstr ""
+
+msgid "How it works"
+msgstr ""
+
+msgid "<strong>Post Editor Uploads:</strong> When you upload images through the post editor (featured image, insert media, etc.), they get renamed with the post slug."
+msgstr ""
+
+msgid "<strong>Media Library Uploads:</strong> Direct uploads to the Media Library keep their original filenames."
+msgstr ""
+
+msgid "<strong>Filename Format:</strong> post-slug-random-suffix.extension"
+msgstr ""
+
+msgid "<strong>Conflict Prevention:</strong> Random suffixes prevent filename conflicts."
+msgstr ""
+
+msgid "Settings Explained"
+msgstr ""
+
+msgid "Turn the plugin functionality on or off."
+msgstr ""
+
+msgid "Character used to separate words in the filename (default: hyphen)."
+msgstr ""
+
+msgid "Maximum length of the post slug part of the filename."
+msgstr ""
+
+msgid "Add timestamp to make filenames even more unique."
+msgstr ""
+
+msgid "Select which post types should have their uploaded images renamed."
+msgstr ""
+
+msgid "Examples"
+msgstr ""
+
+msgid "If your post slug is \"my-awesome-blog-post\" and you upload \"IMG_1234.jpg\":"
+msgstr ""
+
+msgid "Without timestamp: my-awesome-blog-post-abc123.jpg"
+msgstr ""
+
+msgid "With timestamp: my-awesome-blog-post-1640995200-abc123.jpg"
+msgstr ""
+
+msgid "Plugin Information"
+msgstr ""
+
+msgid "Version:"
+msgstr ""
+
+msgid "WordPress Version:"
+msgstr ""
+
+msgid "PHP Version:"
+msgstr ""
+
+msgid "Settings"
+msgstr ""

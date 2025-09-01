@@ -1,0 +1,16 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "WordPress Plugin Development",
+			"type": "shell",
+			"command": "echo",
+			"args": [
+				"WordPress Plugin 'Post Slug Image Renamer' is ready for development!"
+			],
+			"group": "build",
+			"isBackground": false,
+			"problemMatcher": []
+		}
+	]
+}
