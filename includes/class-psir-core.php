@@ -339,7 +339,36 @@ class PSIR_Core {
         $post = get_post($post_id);
         if (!$post) return;
         
-        $updated_content = str_replace($old_url, $new_url, $post->post_content);
+        // Get base filename from URLs
+        $old_filename = basename($old_url);
+        $new_filename = basename($new_url);
+        
+        // Get URL without filename
+        $old_base_url = str_replace($old_filename, '', $old_url);
+        
+        // Use regex to match the old filename in various URL formats
+        $patterns = array(
+            // Standard HTTP/HTTPS URLs
+            '~(https?:)?//' . preg_quote(str_replace(array('http://', 'https://'), '', $old_url), '~') . '~',
+            // Relative URLs
+            '~' . preg_quote($old_base_url . $old_filename, '~') . '~',
+            // URLs without protocol
+            '~//' . preg_quote(str_replace(array('http://', 'https://'), '', $old_url), '~'),
+            // URLs in srcset attribute
+            '~' . preg_quote($old_filename, '~') . '(\s+\d+w)?~'
+        );
+        
+        $updated_content = $post->post_content;
+        
+        foreach ($patterns as $pattern) {
+            if (strpos($pattern, 'srcset') !== false) {
+                // For srcset, replace filename while preserving the width descriptor
+                $updated_content = preg_replace($pattern, $new_filename . '$1', $updated_content);
+            } else {
+                // For regular URLs, replace the entire URL
+                $updated_content = preg_replace($pattern, str_replace($old_filename, $new_filename, '$0'), $updated_content);
+            }
+        }
         
         if ($updated_content !== $post->post_content) {
             wp_update_post(array(
@@ -347,6 +376,31 @@ class PSIR_Core {
                 'post_content' => $updated_content
             ));
             $this->debug_log("Updated post content URLs for post $post_id");
+            
+            // Also update any references in post meta
+            $this->update_post_meta_urls($post_id, $old_url, $new_url);
+        }
+    }
+    
+    /**
+     * Update URLs in post meta
+     */
+    private function update_post_meta_urls($post_id, $old_url, $new_url) {
+        global $wpdb;
+        
+        // Get all meta for this post
+        $meta_values = $wpdb->get_results($wpdb->prepare(
+            "SELECT meta_key, meta_value FROM $wpdb->postmeta WHERE post_id = %d AND meta_value LIKE %s",
+            $post_id,
+            '%' . $wpdb->esc_like($old_url) . '%'
+        ));
+        
+        foreach ($meta_values as $meta) {
+            $updated_value = str_replace($old_url, $new_url, $meta->meta_value);
+            if ($updated_value !== $meta->meta_value) {
+                update_post_meta($post_id, $meta->meta_key, $updated_value);
+                $this->debug_log("Updated URL in post meta: {$meta->meta_key}");
+            }
         }
     }
     
