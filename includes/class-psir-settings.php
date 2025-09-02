@@ -21,10 +21,14 @@ class PSIR_Settings {
     }
     
     private function __construct() {
+<<<<<<< HEAD
         // Only initialize settings if in admin area
         if (is_admin()) {
             add_action('admin_init', array($this, 'init_settings'));
         }
+=======
+        add_action('admin_init', array($this, 'init_settings'));
+>>>>>>> 55c56f993a3146f41c0b6cb14142ad3ca0f3530e
     }
     
     /**

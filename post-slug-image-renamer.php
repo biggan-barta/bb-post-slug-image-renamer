@@ -3,7 +3,11 @@
  * Plugin Name: BB Post Slug Renamer
  * Plugin URI: https://github.com/biggan-barta/bb-post-slug-image-renamer
  * Description: Automatically renames uploaded images with post slug when uploading from post editor (featured image, post content), but leaves Media Library uploads unchanged.
+<<<<<<< HEAD
  * Version: 1.0.9
+=======
+ * Version: 1.0.4
+>>>>>>> 55c56f993a3146f41c0b6cb14142ad3ca0f3530e
  * Author: BigganBarta
  * Author URI: https://bigganbarta.org
  * License: GPL v2 or later
@@ -19,19 +23,26 @@ if (!defined('ABSPATH')) {
 // Define plugin constants
 define('PSIR_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('PSIR_PLUGIN_PATH', plugin_dir_path(__FILE__));
+<<<<<<< HEAD
 define('PSIR_VERSION', '1.0.9');
 
 // Debug mode - set to true only for debugging (impacts performance)
 if (!defined('PSIR_DEBUG')) {
     define('PSIR_DEBUG', false);
 }
+=======
+define('PSIR_VERSION', '1.0.0');
+>>>>>>> 55c56f993a3146f41c0b6cb14142ad3ca0f3530e
 
 // Include required files
 require_once PSIR_PLUGIN_PATH . 'includes/class-psir-core.php';
 require_once PSIR_PLUGIN_PATH . 'includes/class-psir-settings.php';
 require_once PSIR_PLUGIN_PATH . 'includes/class-psir-admin.php';
+<<<<<<< HEAD
 require_once PSIR_PLUGIN_PATH . 'includes/class-psir-admin-settings.php';
 require_once PSIR_PLUGIN_PATH . 'includes/social-compatibility.php';
+=======
+>>>>>>> 55c56f993a3146f41c0b6cb14142ad3ca0f3530e
 
 /**
  * Main plugin class
@@ -54,6 +65,7 @@ class PostSlugImageRenamer {
     }
     
     public function init() {
+<<<<<<< HEAD
         // Load text domain only if needed
         if (is_admin() || (defined('DOING_AJAX') && DOING_AJAX)) {
             load_plugin_textdomain('post-slug-image-renamer', false, dirname(plugin_basename(__FILE__)) . '/languages');
@@ -63,6 +75,15 @@ class PostSlugImageRenamer {
         PSIR_Core::get_instance();
         
         // Initialize admin only when in admin area
+=======
+        // Load text domain
+        load_plugin_textdomain('post-slug-image-renamer', false, dirname(plugin_basename(__FILE__)) . '/languages');
+        
+        // Initialize core functionality
+        PSIR_Core::get_instance();
+        
+        // Initialize admin if in admin
+>>>>>>> 55c56f993a3146f41c0b6cb14142ad3ca0f3530e
         if (is_admin()) {
             PSIR_Admin::get_instance();
         }

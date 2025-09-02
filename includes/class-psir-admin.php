@@ -23,6 +23,7 @@ class PSIR_Admin {
     private function __construct() {
         $this->settings = PSIR_Settings::get_instance();
         $this->init_hooks();
+<<<<<<< HEAD
         
         // Check if logs table exists and show admin notice if not
         add_action('admin_notices', array($this, 'check_logs_table'));
@@ -40,6 +41,14 @@ class PSIR_Admin {
         
         // Only enqueue scripts on our plugin pages
         add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts_conditionally'));
+=======
+    }
+    
+    private function init_hooks() {
+        add_action('admin_menu', array($this, 'add_admin_menu'));
+        add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_scripts'));
+        add_filter('plugin_action_links_' . plugin_basename(PSIR_PLUGIN_PATH . 'post-slug-image-renamer.php'), array($this, 'add_settings_link'));
+>>>>>>> 55c56f993a3146f41c0b6cb14142ad3ca0f3530e
     }
     
     /**
@@ -85,10 +94,16 @@ class PSIR_Admin {
     }
     
     /**
+<<<<<<< HEAD
      * Conditionally enqueue admin scripts and styles - optimized
      */
     public function enqueue_admin_scripts_conditionally($hook) {
         // Only load on plugin pages
+=======
+     * Enqueue admin scripts and styles
+     */
+    public function enqueue_admin_scripts($hook) {
+>>>>>>> 55c56f993a3146f41c0b6cb14142ad3ca0f3530e
         if (strpos($hook, 'post-slug-image-renamer') === false && strpos($hook, 'psir-') === false) {
             return;
         }
@@ -168,6 +183,7 @@ class PSIR_Admin {
      * Statistics page
      */
     public function statistics_page() {
+<<<<<<< HEAD
         // Handle clear statistics action
         if (isset($_POST['clear_stats']) && wp_verify_nonce($_POST['_wpnonce'], 'psir_clear_stats')) {
             $core = PSIR_Core::get_instance();
@@ -182,12 +198,15 @@ class PSIR_Admin {
         $settings = get_option('psir_settings', array());
         $statistics_enabled = ($settings['enable_statistics'] ?? 'off') === 'on';
         
+=======
+>>>>>>> 55c56f993a3146f41c0b6cb14142ad3ca0f3530e
         $core = PSIR_Core::get_instance();
         $stats = $core->get_stats();
         ?>
         <div class="wrap">
             <h1><?php _e('Statistics', 'post-slug-image-renamer'); ?></h1>
             
+<<<<<<< HEAD
             <?php if (!$statistics_enabled): ?>
                 <div class="notice notice-warning">
                     <h3><?php _e('⚡ Statistics Collection Disabled', 'post-slug-image-renamer'); ?></h3>
@@ -263,6 +282,27 @@ class PSIR_Admin {
                                 <?php endif; ?>
                             </div>
                         <?php else: ?>
+=======
+            <div class="psir-admin-container">
+                <div class="psir-stats-grid">
+                    <div class="psir-stat-card">
+                        <h3><?php _e('Total Images Renamed', 'post-slug-image-renamer'); ?></h3>
+                        <div class="psir-stat-number"><?php echo number_format($stats['total_renamed']); ?></div>
+                    </div>
+                    
+                    <div class="psir-stat-card">
+                        <h3><?php _e('Total File Size', 'post-slug-image-renamer'); ?></h3>
+                        <div class="psir-stat-number"><?php echo $this->format_bytes($stats['total_size']); ?></div>
+                    </div>
+                </div>
+                
+                <div class="psir-recent-renames">
+                    <h3><?php _e('Recent Renames', 'post-slug-image-renamer'); ?></h3>
+                    
+                    <?php if (empty($stats['recent_renames'])): ?>
+                        <p><?php _e('No image renames recorded yet.', 'post-slug-image-renamer'); ?></p>
+                    <?php else: ?>
+>>>>>>> 55c56f993a3146f41c0b6cb14142ad3ca0f3530e
                         <table class="wp-list-table widefat fixed striped">
                             <thead>
                                 <tr>
@@ -369,6 +409,7 @@ class PSIR_Admin {
                             <td><strong><?php _e('PHP Version:', 'post-slug-image-renamer'); ?></strong></td>
                             <td><?php echo PHP_VERSION; ?></td>
                         </tr>
+<<<<<<< HEAD
                         <tr>
                             <td><strong><?php _e('Debug Mode:', 'post-slug-image-renamer'); ?></strong></td>
                             <td>
@@ -527,6 +568,10 @@ $image_url = apply_filters('psir_get_social_image', $default_url, $post_id);</co
                         <li><strong>v1.0.4:</strong> <?php _e('Fixed post content URL updates', 'post-slug-image-renamer'); ?></li>
                     </ul>
                 </div>
+=======
+                    </table>
+                </div>
+>>>>>>> 55c56f993a3146f41c0b6cb14142ad3ca0f3530e
             </div>
         </div>
         <?php
@@ -544,6 +589,7 @@ $image_url = apply_filters('psir_get_social_image', $default_url, $post_id);</co
         
         return round($bytes, $precision) . ' ' . $units[$i];
     }
+<<<<<<< HEAD
     
     /**
      * Check if logs table exists and show notice if not
@@ -567,4 +613,6 @@ $image_url = apply_filters('psir_get_social_image', $default_url, $post_id);</co
             <?php
         }
     }
+=======
+>>>>>>> 55c56f993a3146f41c0b6cb14142ad3ca0f3530e
 }
