@@ -3,7 +3,7 @@
  * Plugin Name: BB Post Slug Renamer
  * Plugin URI: https://github.com/biggan-barta/bb-post-slug-image-renamer
  * Description: Automatically renames uploaded images with post slug when uploading from post editor (featured image, post content), but leaves Media Library uploads unchanged.
- * Version: 1.0.3
+ * Version: 1.0.9
  * Author: BigganBarta
  * Author URI: https://bigganbarta.org
  * License: GPL v2 or later
@@ -19,12 +19,19 @@ if (!defined('ABSPATH')) {
 // Define plugin constants
 define('PSIR_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('PSIR_PLUGIN_PATH', plugin_dir_path(__FILE__));
-define('PSIR_VERSION', '1.0.0');
+define('PSIR_VERSION', '1.0.9');
+
+// Debug mode - set to true only for debugging (impacts performance)
+if (!defined('PSIR_DEBUG')) {
+    define('PSIR_DEBUG', false);
+}
 
 // Include required files
 require_once PSIR_PLUGIN_PATH . 'includes/class-psir-core.php';
 require_once PSIR_PLUGIN_PATH . 'includes/class-psir-settings.php';
 require_once PSIR_PLUGIN_PATH . 'includes/class-psir-admin.php';
+require_once PSIR_PLUGIN_PATH . 'includes/class-psir-admin-settings.php';
+require_once PSIR_PLUGIN_PATH . 'includes/social-compatibility.php';
 
 /**
  * Main plugin class
@@ -47,13 +54,15 @@ class PostSlugImageRenamer {
     }
     
     public function init() {
-        // Load text domain
-        load_plugin_textdomain('post-slug-image-renamer', false, dirname(plugin_basename(__FILE__)) . '/languages');
+        // Load text domain only if needed
+        if (is_admin() || (defined('DOING_AJAX') && DOING_AJAX)) {
+            load_plugin_textdomain('post-slug-image-renamer', false, dirname(plugin_basename(__FILE__)) . '/languages');
+        }
         
-        // Initialize core functionality
+        // Initialize core functionality (always needed)
         PSIR_Core::get_instance();
         
-        // Initialize admin if in admin
+        // Initialize admin only when in admin area
         if (is_admin()) {
             PSIR_Admin::get_instance();
         }

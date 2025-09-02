@@ -201,3 +201,114 @@
     text-align: center;
     margin-top: 10px;
 }
+
+/* Debug and Developer Info Styles */
+.psir-code-box {
+    background: #f1f1f1;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 15px;
+    margin: 15px 0;
+}
+
+.psir-code-box pre {
+    background: #2c3e50;
+    color: #ecf0f1;
+    padding: 10px;
+    border-radius: 3px;
+    overflow-x: auto;
+    margin: 10px 0;
+}
+
+.psir-code-box code {
+    font-family: 'Courier New', Monaco, monospace;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.psir-code-box h4 {
+    margin: 15px 0 10px 0;
+    color: #2c3e50;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.psir-code-box ul, 
+.psir-code-box ol {
+    margin: 10px 0;
+    padding-left: 25px;
+}
+
+.psir-code-box li {
+    margin-bottom: 5px;
+    line-height: 1.5;
+}
+
+.psir-about-section {
+    margin-bottom: 30px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #e1e1e1;
+}
+
+.psir-about-section:last-child {
+    border-bottom: none;
+}
+
+.psir-about-section h2 {
+    color: #23282d;
+    margin-bottom: 15px;
+    font-size: 18px;
+}
+
+.psir-about-section h3 {
+    color: #2c3e50;
+    margin: 20px 0 10px 0;
+    font-size: 16px;
+}
+
+.psir-info-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 15px 0;
+}
+
+.psir-info-table td {
+    padding: 8px 12px;
+    border: 1px solid #ddd;
+    vertical-align: top;
+}
+
+.psir-info-table td:first-child {
+    background: #f9f9f9;
+    width: 30%;
+    font-weight: 500;
+}
+
+.psir-info-table a {
+    color: #0073aa;
+    text-decoration: none;
+}
+
+.psir-info-table a:hover {
+    text-decoration: underline;
+}
+
+/* Statistics page styles */
+.psir-no-stats {
+    background: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 20px;
+    text-align: center;
+}
+
+.psir-no-stats ol {
+    text-align: left;
+    display: inline-block;
+    margin: 15px 0;
+}
+
+.notice.inline {
+    margin: 15px 0;
+    padding: 10px;
+}
