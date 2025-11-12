@@ -525,6 +525,7 @@ $image_url = apply_filters('psir_get_social_image', $default_url, $post_id);</co
                     
                     <h3><?php _e('Recent Updates', 'post-slug-image-renamer'); ?></h3>
                     <ul>
+                        <li><strong>v1.1.0:</strong> <?php _e('Fixed duplicate filename issue for multiple images, added unique hash suffix to prevent collisions', 'post-slug-image-renamer'); ?></li>
                         <li><strong>v1.0.7:</strong> <?php _e('Performance optimized social media compatibility', 'post-slug-image-renamer'); ?></li>
                         <li><strong>v1.0.6:</strong> <?php _e('Added auto-posting plugin compatibility', 'post-slug-image-renamer'); ?></li>
                         <li><strong>v1.0.5:</strong> <?php _e('Major performance improvements', 'post-slug-image-renamer'); ?></li>
