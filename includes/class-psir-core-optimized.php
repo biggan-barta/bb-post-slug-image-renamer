@@ -156,9 +156,9 @@ class PSIR_Core {
             return;
         }
         
-        // Generate new filename
+        // Generate new filename with directory path for uniqueness check
         $path_info = pathinfo($current_file);
-        $new_filename = $this->generate_new_filename($path_info['basename'], $post_slug);
+        $new_filename = $this->generate_new_filename($path_info['basename'], $post_slug, $path_info['dirname']);
         $new_file_path = $path_info['dirname'] . '/' . $new_filename;
         
         // Skip if filename would be the same
@@ -272,9 +272,9 @@ class PSIR_Core {
     }
     
     /**
-     * Generate new filename - optimized
+     * Generate new filename - optimized with unique suffix
      */
-    private function generate_new_filename($original_filename, $post_slug) {
+    private function generate_new_filename($original_filename, $post_slug, $upload_dir = null) {
         if (empty($post_slug)) {
             return $original_filename;
         }
@@ -297,7 +297,29 @@ class PSIR_Core {
             $new_name .= '-' . time();
         }
         
-        return $new_name . '.' . $extension;
+        // Always add a unique random suffix to prevent duplicate filenames
+        // This ensures multiple images in the same post get unique names
+        $random_suffix = substr(md5(uniqid($original_filename, true)), 0, 8);
+        $new_name .= '-' . $random_suffix;
+        
+        $new_filename = $new_name . '.' . $extension;
+        
+        // Additional safety: Check if file exists and add counter if needed
+        if ($upload_dir) {
+            $counter = 1;
+            $base_new_name = $new_name;
+            while (file_exists($upload_dir . '/' . $new_filename)) {
+                $new_name = $base_new_name . '-' . $counter;
+                $new_filename = $new_name . '.' . $extension;
+                $counter++;
+                // Safety limit to prevent infinite loop
+                if ($counter > 100) {
+                    break;
+                }
+            }
+        }
+        
+        return $new_filename;
     }
     
     /**
@@ -328,8 +350,12 @@ class PSIR_Core {
             $post_slug = 'post-' . $post_id;
         }
         
-        // Generate new filename
-        $new_filename = $this->generate_new_filename($file['name'], $post_slug);
+        // Get upload directory for uniqueness check
+        $upload_dir = wp_upload_dir();
+        $target_dir = $upload_dir['path'];
+        
+        // Generate new filename with directory path for uniqueness check
+        $new_filename = $this->generate_new_filename($file['name'], $post_slug, $target_dir);
         
         if ($new_filename && $new_filename !== $file['name']) {
             $file['name'] = $new_filename;
