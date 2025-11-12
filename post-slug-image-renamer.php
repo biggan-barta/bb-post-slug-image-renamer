@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
 // Define plugin constants
 define('PSIR_PLUGIN_URL', plugin_dir_url(__FILE__));
 define('PSIR_PLUGIN_PATH', plugin_dir_path(__FILE__));
-define('PSIR_VERSION', '1.0.9');
+define('PSIR_VERSION', '1.1.0');
 
 // Debug mode - set to true only for debugging (impacts performance)
 if (!defined('PSIR_DEBUG')) {

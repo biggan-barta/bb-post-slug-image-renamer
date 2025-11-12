@@ -75,6 +75,13 @@ This plugin is licensed under the GPL v2 or later.
 
 ## Changelog
 
+### 1.1.0
+- **Fixed:** Critical bug where multiple images in same post were renamed with identical filenames
+- **Added:** Unique 8-character hash suffix to every renamed image for collision prevention
+- **Added:** File existence check with counter mechanism for edge cases
+- **Added:** Developer attribution (Tanvir Rana Rabbi) to About page
+- **Improved:** Enhanced filename uniqueness algorithm using MD5 with uniqid
+
 ### 1.0.0
 - Initial release
 - Automatic image renaming based on post slug
