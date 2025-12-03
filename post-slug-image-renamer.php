@@ -3,7 +3,7 @@
  * Plugin Name: BB Post Slug Renamer
  * Plugin URI: https://github.com/biggan-barta/bb-post-slug-image-renamer
  * Description: Automatically renames uploaded images with post slug when uploading from post editor (featured image, post content), but leaves Media Library uploads unchanged.
- * Version: 1.1.0
+ * Version: 1.1.1
  * Author: BigganBarta
  * Author URI: https://bigganbarta.org
  * License: GPL v2 or later
@@ -24,6 +24,11 @@ define('PSIR_VERSION', '1.1.0');
 // Debug mode - set to true only for debugging (impacts performance)
 if (!defined('PSIR_DEBUG')) {
     define('PSIR_DEBUG', false);
+}
+
+// Statistics mode - set to true to enable statistics collection
+if (!defined('PSIR_ENABLE_STATISTICS')) {
+    define('PSIR_ENABLE_STATISTICS', false);
 }
 
 // Include required files
@@ -78,7 +83,7 @@ class PostSlugImageRenamer {
             'include_timestamp' => false,
             'preserve_original_extension' => true,
             'allowed_post_types' => array('post', 'page'),
-            'update_image_title' => true,
+            'update_image_title' => false,
             'filename_prefix' => '',
             'filename_suffix' => '',
             'title_prefix' => '',

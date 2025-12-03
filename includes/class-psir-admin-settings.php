@@ -35,7 +35,7 @@ class PSIR_Admin_Settings {
      */
     public function add_admin_menu() {
         add_submenu_page(
-            'psir-settings',
+            'post-slug-image-renamer',
             __('Advanced Settings', 'post-slug-image-renamer'),
             __('Advanced', 'post-slug-image-renamer'),
             'manage_options',

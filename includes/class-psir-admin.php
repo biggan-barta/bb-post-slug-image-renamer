@@ -248,7 +248,7 @@ class PSIR_Admin {
                                 <?php 
                                 global $wpdb;
                                 $table_name = $wpdb->prefix . 'psir_logs';
-                                if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name): ?>
+                                if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) != $table_name): ?>
                                     <div class="notice notice-warning inline">
                                         <p><strong><?php _e('Database table missing!', 'post-slug-image-renamer'); ?></strong></p>
                                         <p><?php _e('The statistics table wasn\'t created during plugin activation. Try deactivating and reactivating the plugin.', 'post-slug-image-renamer'); ?></p>
@@ -385,7 +385,7 @@ class PSIR_Admin {
                                 <?php 
                                 global $wpdb;
                                 $table_name = $wpdb->prefix . 'psir_logs';
-                                if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name): ?>
+                                if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) == $table_name): ?>
                                     <span style="color: green;">✓ <?php _e('Created', 'post-slug-image-renamer'); ?></span>
                                 <?php else: ?>
                                     <span style="color: red;">✗ <?php _e('Missing', 'post-slug-image-renamer'); ?></span>
@@ -563,7 +563,7 @@ $image_url = apply_filters('psir_get_social_image', $default_url, $post_id);</co
         global $wpdb;
         $table_name = $wpdb->prefix . 'psir_logs';
         
-        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
+        if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) != $table_name) {
             ?>
             <div class="notice notice-warning">
                 <p><strong><?php _e('Post Slug Image Renamer:', 'post-slug-image-renamer'); ?></strong> 

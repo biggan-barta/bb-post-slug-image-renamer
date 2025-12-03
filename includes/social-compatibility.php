@@ -95,6 +95,11 @@ class PSIR_Social_Compatibility {
             return self::$has_auto_plugins;
         }
         
+        // Include plugin.php if not already loaded
+        if (!function_exists('is_plugin_active')) {
+            include_once(ABSPATH . 'wp-admin/includes/plugin.php');
+        }
+        
         // Check for specific plugin classes/functions only
         self::$has_auto_plugins = (
             class_exists('Jetpack') ||

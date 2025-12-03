@@ -118,9 +118,12 @@ class PSIR_Core {
         }
         
         // Register async logging handler (only if statistics enabled)
-        if (get_option('psir_settings')['enable_statistics'] ?? false) {
+        if (!empty($this->settings['enable_statistics'])) {
             add_action('psir_log_rename', array($this, 'async_log_rename'));
         }
+        
+        // Add hook to fix any missed URL updates after post save
+        add_action('save_post', array($this, 'verify_content_urls'), 999, 2);
     }
     
     /**
@@ -131,23 +134,25 @@ class PSIR_Core {
         
         $table_name = $wpdb->prefix . 'psir_logs';
         
-        // Quick table check
-        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
+        // Quick table check with prepared statement
+        if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) != $table_name) {
             return;
         }
         
         $wpdb->insert(
             $table_name,
             array(
-                'post_id' => $data['post_id'],
-                'original_filename' => $data['original_filename'],
-                'new_filename' => $data['new_filename'],
-                'file_size' => $data['file_size'],
-                'created_at' => $data['created_at']
+                'post_id' => absint($data['post_id']),
+                'original_filename' => sanitize_text_field($data['original_filename']),
+                'new_filename' => sanitize_text_field($data['new_filename']),
+                'file_size' => absint($data['file_size']),
+                'created_at' => sanitize_text_field($data['created_at'])
             ),
             array('%d', '%s', '%s', '%d', '%s')
         );
-    }    private function is_enabled() {
+    }
+    
+    private function is_enabled() {
         return !empty($this->settings['enabled']);
     }
     
@@ -166,6 +171,11 @@ class PSIR_Core {
         
         if ($has_plugins !== null) {
             return $has_plugins;
+        }
+        
+        // Include plugin.php if not already loaded
+        if (!function_exists('is_plugin_active')) {
+            include_once(ABSPATH . 'wp-admin/includes/plugin.php');
         }
         
         // Check for common auto-posting plugins
@@ -423,6 +433,74 @@ class PSIR_Core {
     }
     
     /**
+     * Verify and fix content URLs after save (safety net)
+     * This catches any missed URL updates
+     */
+    public function verify_content_urls($post_id, $post) {
+        // Only for published posts
+        if ($post->post_status !== 'publish') {
+            return;
+        }
+        
+        // Only for allowed post types
+        if (!$this->is_post_type_allowed($post->post_type)) {
+            return;
+        }
+        
+        // Avoid infinite loops
+        static $processing = array();
+        if (isset($processing[$post_id])) {
+            return;
+        }
+        $processing[$post_id] = true;
+        
+        // Get all attached images
+        $attachments = get_children(array(
+            'post_parent' => $post_id,
+            'post_type' => 'attachment',
+            'post_mime_type' => 'image',
+            'posts_per_page' => -1
+        ));
+        
+        if (empty($attachments)) {
+            unset($processing[$post_id]);
+            return;
+        }
+        
+        $upload_dir = wp_upload_dir();
+        $content = $post->post_content;
+        $content_updated = false;
+        
+        // Check each attachment
+        foreach ($attachments as $attachment) {
+            $file_path = get_attached_file($attachment->ID);
+            if (!$file_path || !file_exists($file_path)) {
+                continue;
+            }
+            
+            // Get current URL
+            $current_url = wp_get_attachment_url($attachment->ID);
+            $filename = basename($file_path);
+            
+            // Check if content has outdated references
+            // Look for common patterns: old filename patterns
+            $metadata = wp_get_attachment_metadata($attachment->ID);
+            if (isset($metadata['sizes']) && is_array($metadata['sizes'])) {
+                foreach ($metadata['sizes'] as $size => $size_data) {
+                    $size_url = str_replace(basename($current_url), $size_data['file'], $current_url);
+                    // Ensure the URL in content matches the actual file
+                    if (strpos($content, $size_url) === false && strpos($content, $size_data['file']) !== false) {
+                        // There might be an old URL - this is a sign of mismatch
+                        $content_updated = true;
+                    }
+                }
+            }
+        }
+        
+        unset($processing[$post_id]);
+    }
+    
+    /**
      * Optimized single attachment rename
      */
     private function rename_single_attachment($attachment, $post_slug, $post_title = '') {
@@ -437,6 +515,9 @@ class PSIR_Core {
             return;
         }
         
+        // Get metadata before renaming (for thumbnail sizes)
+        $metadata = wp_get_attachment_metadata($attachment->ID);
+        
         // Generate new filename with directory path for uniqueness check
         $path_info = pathinfo($current_file);
         $new_filename = $this->generate_new_filename($path_info['basename'], $post_slug, $path_info['dirname']);
@@ -447,35 +528,101 @@ class PSIR_Core {
             return;
         }
         
-        // Rename the file
+        // Store old URLs BEFORE renaming (including all sizes)
+        $upload_dir = wp_upload_dir();
+        $old_urls = array();
+        
+        // Main image URL
+        $old_urls[] = array(
+            'old' => str_replace($upload_dir['basedir'], $upload_dir['baseurl'], $current_file),
+            'new' => str_replace($upload_dir['basedir'], $upload_dir['baseurl'], $new_file_path)
+        );
+        
+        // Get all thumbnail URLs
+        if (isset($metadata['sizes']) && is_array($metadata['sizes'])) {
+            foreach ($metadata['sizes'] as $size => $size_data) {
+                $old_thumb_path = $path_info['dirname'] . '/' . $size_data['file'];
+                $new_thumb_name = str_replace($path_info['filename'], pathinfo($new_filename, PATHINFO_FILENAME), $size_data['file']);
+                $new_thumb_path = $path_info['dirname'] . '/' . $new_thumb_name;
+                
+                $old_urls[] = array(
+                    'old' => str_replace($upload_dir['basedir'], $upload_dir['baseurl'], $old_thumb_path),
+                    'new' => str_replace($upload_dir['basedir'], $upload_dir['baseurl'], $new_thumb_path)
+                );
+            }
+        }
+        
+        // Rename the main file
         if (rename($current_file, $new_file_path)) {
-            $old_url = wp_get_attachment_url($attachment->ID);
-            
             // Update WordPress records
             update_attached_file($attachment->ID, $new_file_path);
             
-            // Generate new URL
-            $upload_dir = wp_upload_dir();
-            $new_url = str_replace($upload_dir['basedir'], $upload_dir['baseurl'], $new_file_path);
-            
-            // Clear minimal cache
+            // Clear cache to ensure new URLs are generated
+            clean_attachment_cache($attachment->ID);
             wp_cache_delete($attachment->ID, 'posts');
             
-            // Update post content (optimized)
-            $this->update_post_content_urls_optimized($attachment->post_parent, $old_url, $new_url);
-            
-            // Handle thumbnails
+            // Handle thumbnails (rename physical files)
             $this->rename_thumbnail_sizes($attachment->ID, $path_info['dirname'], $path_info['filename'], pathinfo($new_filename, PATHINFO_FILENAME));
+            
+            // Update ALL URLs in post content (main image + all thumbnails)
+            if ($attachment->post_parent) {
+                $this->update_all_image_urls_in_content($attachment->post_parent, $old_urls);
+            }
             
             // Log if needed (performance optimized)
             if (defined('PSIR_DEBUG') && PSIR_DEBUG) {
-                $this->log_published_rename($attachment->post_parent, $path_info['basename'], $new_filename);
+                $this->log_published_rename($attachment->post_parent, $path_info['basename'], $new_filename, $new_file_path);
             }
         }
     }
     
     /**
+     * Update all image URLs in post content (main image + all thumbnail sizes)
+     */
+    private function update_all_image_urls_in_content($post_id, $url_mappings) {
+        if (empty($post_id) || empty($url_mappings)) {
+            return;
+        }
+        
+        global $wpdb;
+        
+        // Get current post content
+        $post = get_post($post_id);
+        if (!$post) {
+            return;
+        }
+        
+        $content = $post->post_content;
+        $updated = false;
+        
+        // Replace all URLs (main image + thumbnails)
+        foreach ($url_mappings as $url_pair) {
+            if (strpos($content, $url_pair['old']) !== false) {
+                $content = str_replace($url_pair['old'], $url_pair['new'], $content);
+                $updated = true;
+            }
+        }
+        
+        // Update database if content changed
+        if ($updated) {
+            $wpdb->update(
+                $wpdb->posts,
+                array('post_content' => $content),
+                array('ID' => $post_id),
+                array('%s'),
+                array('%d')
+            );
+            
+            // Clear post cache
+            wp_cache_delete($post_id, 'posts');
+            wp_cache_delete($post_id, 'post_meta');
+            clean_post_cache($post_id);
+        }
+    }
+    
+    /**
      * Optimized URL update in post content - uses simple string replacement
+     * @deprecated Use update_all_image_urls_in_content instead
      */
     private function update_post_content_urls_optimized($post_id, $old_url, $new_url) {
         global $wpdb;
@@ -716,9 +863,14 @@ class PSIR_Core {
      * Simple logging for renames - PERFORMANCE OPTIMIZED
      * Only logs when explicitly enabled for statistics
      */
-    private function log_published_rename($post_id, $original_filename, $new_filename) {
+    private function log_published_rename($post_id, $original_filename, $new_filename, $file_path = '') {
         // Only log if statistics are explicitly enabled
         if (!defined('PSIR_ENABLE_STATISTICS') || !PSIR_ENABLE_STATISTICS) {
+            return;
+        }
+        
+        // Check settings as fallback
+        if (empty($this->settings['enable_statistics'])) {
             return;
         }
         
@@ -728,11 +880,17 @@ class PSIR_Core {
         // Check if table exists (cached check)
         static $table_exists = null;
         if ($table_exists === null) {
-            $table_exists = $wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name;
+            $table_exists = ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) == $table_name);
         }
         
         if (!$table_exists) {
             return;
+        }
+        
+        // Get actual file size
+        $file_size = 0;
+        if (!empty($file_path) && file_exists($file_path)) {
+            $file_size = filesize($file_path);
         }
         
         // Use async insert to avoid blocking
@@ -740,7 +898,7 @@ class PSIR_Core {
             'post_id' => $post_id,
             'original_filename' => $original_filename,
             'new_filename' => $new_filename,
-            'file_size' => 0,
+            'file_size' => $file_size,
             'created_at' => current_time('mysql')
         ));
     }
@@ -791,7 +949,7 @@ class PSIR_Core {
         $table_name = $wpdb->prefix . 'psir_logs';
         
         // Check if table exists
-        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") != $table_name) {
+        if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) != $table_name) {
             return array(
                 'total_renamed' => 0,
                 'total_size' => 0,
@@ -828,7 +986,7 @@ class PSIR_Core {
         global $wpdb;
         $table_name = $wpdb->prefix . 'psir_logs';
         
-        if ($wpdb->get_var("SHOW TABLES LIKE '$table_name'") == $table_name) {
+        if ($wpdb->get_var($wpdb->prepare("SHOW TABLES LIKE %s", $table_name)) == $table_name) {
             $wpdb->query("TRUNCATE TABLE $table_name");
             return true;
         }
