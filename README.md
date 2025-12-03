@@ -75,6 +75,21 @@ This plugin is licensed under the GPL v2 or later.
 
 ## Changelog
 
+### 1.1.1
+- **Fixed:** Critical bug where post content img tags weren't updating with renamed image URLs
+- **Fixed:** Missing PSIR_ENABLE_STATISTICS constant definition
+- **Fixed:** Submenu parent slug mismatch in advanced settings
+- **Fixed:** SQL injection vulnerabilities in database queries (added prepared statements)
+- **Fixed:** is_plugin_active() function not available on frontend (added include guard)
+- **Fixed:** File size always logged as 0 in statistics (now captures actual file size)
+- **Improved:** Post content URL updates now handle all image sizes (thumbnail, medium, large, full)
+- **Improved:** Better cache clearing using clean_attachment_cache() and clean_post_cache()
+- **Improved:** Added comprehensive URL mapping before file rename operations
+- **Improved:** Added verify_content_urls() safety net to catch missed URL updates
+- **Security:** Sanitized all database inputs with absint() and sanitize_text_field()
+- **Security:** All SQL queries now use $wpdb->prepare() for proper escaping
+- **Code Quality:** Fixed inconsistent default values and improved code formatting
+
 ### 1.1.0
 - **Fixed:** Critical bug where multiple images in same post were renamed with identical filenames
 - **Added:** Unique 8-character hash suffix to every renamed image for collision prevention
